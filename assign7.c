@@ -6,11 +6,11 @@
 #include "assign7.h"
 
 int main () {
-    // Open for read and write and create file if it does not exist
-    int fd = open(INVENTORY, O_RDWR | O_CREAT);
+    // Open for read and write and create file if it does not exist and give it proper permissions
+    int fd = open(INVENTORY, O_RDWR | O_CREAT, 0755);
     
     if (fd < 0) {
-        printf("Could not open file %s", INVENTORY);
+        printf("Could not open file %s\n", INVENTORY);
         return 1;
     }
 
@@ -22,15 +22,17 @@ int main () {
 
 void input_loop(int fd) {
     char opt;
+    int c;
     int keep_going = 1;
-    int count = 0;
 
     while (keep_going) {
         printf("%s", OPTIONS);
         scanf(" %c", &opt);
 
-        count++;
-        if (count == 3) return;
+        if ((c = getchar()) == EOF) {
+            printf("EOF found. Exiting Program.\n");
+            return;
+        }
 
         switch (tolower(opt)) {
             case 'c':
@@ -78,7 +80,7 @@ void update_record (int fd) {
     struct Item item = get_item(fd, item_number);
 
     if (item.max_quantity == 0) {
-        printf("ERROR: item not found\n");
+        printf("ERROR: item: %d not found\n", item_number);
         return;
     }
 
@@ -94,7 +96,7 @@ void delete_record (int fd) {
     struct Item item = get_item(fd, item_number);
 
     if (item.max_quantity == 0) {
-        printf("ERROR: item not found\n");
+        printf("ERROR: item: %d not found\n", item_number);
         return;
     }
 
@@ -130,7 +132,7 @@ struct Item get_item (int fd, int item_number) {
 
 void print_item (struct Item item, int item_number) {
     if (item.max_quantity == 0) {
-        printf("\nERROR: item not found\n");
+        printf("\nERROR: item: %d not found\n", item_number);
         return;
     }
 
